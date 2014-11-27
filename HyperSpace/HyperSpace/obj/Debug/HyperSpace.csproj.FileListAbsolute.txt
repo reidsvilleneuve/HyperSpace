@@ -1,1 +1,6 @@
 C:\Users\Reid\Documents\GitHub\HyperSpace\HyperSpace\HyperSpace\bin\Debug\HyperSpace.exe.config
+C:\Users\Reid\Documents\GitHub\HyperSpace\HyperSpace\HyperSpace\bin\Debug\HyperSpace.exe
+C:\Users\Reid\Documents\GitHub\HyperSpace\HyperSpace\HyperSpace\bin\Debug\HyperSpace.pdb
+C:\Users\Reid\Documents\GitHub\HyperSpace\HyperSpace\HyperSpace\obj\Debug\HyperSpace.csprojResolveAssemblyReference.cache
+C:\Users\Reid\Documents\GitHub\HyperSpace\HyperSpace\HyperSpace\obj\Debug\HyperSpace.exe
+C:\Users\Reid\Documents\GitHub\HyperSpace\HyperSpace\HyperSpace\obj\Debug\HyperSpace.pdb

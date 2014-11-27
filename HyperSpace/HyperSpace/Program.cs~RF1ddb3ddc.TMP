@@ -1,0 +1,153 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace HyperSpace
+{
+    class Program
+    {
+        static void Main(string[] args)
+        {
+        }
+    }
+
+    /// <summary>
+    /// A single unit for a Hyperspace game.
+    /// </summary>
+    class Unit
+    {
+        public enum Direction { Up, Down }
+        public enum Power { Ammo, Speed, Health, Random }
+
+
+        // ---- Properties ----
+
+
+        public int X { get; set; }
+        public int Y { get; set; }
+        public Direction Dir { get; set; }
+        
+        public ConsoleColor Color { get; set; }
+        public string Symbol { get; set; }
+
+        public bool IsPowerUp { get; set; }
+        public Power PowerUpType { get; set; }
+
+
+        // ---- Variables ---- 
+
+
+        static List<string> ObstacleList = "! . : ; ' \"".Split().ToList(); //All of the possible obsticles.
+        static Random rng = new Random();
+
+
+        // ---- Constructors ---- 
+
+
+        /// <summary>
+        /// Sets this unit as an obsticle.
+        /// </summary>
+        /// <param name="y"></param>
+        /// <param name="x"></param>
+        /// <param name="dir"></param>
+        Unit(int y, int x, Direction dir)
+        {
+            this.Y = y;
+            this.X = x;
+            this.Dir = dir;
+
+            this.Color = ConsoleColor.Cyan;
+            this.Symbol = ObstacleList[rng.Next(ObstacleList.Count)]; //Random symbol from the ObstacleList
+            this.IsPowerUp = false;
+        }
+
+        /// <summary>
+        /// Set this unit as a power up.
+        /// </summary>
+        /// <param name="x">The X position of the unit.</param>
+        /// <param name="y">The Y position of the unit.</param>
+        /// <param name="power">The type of power-up that this unit gives.</param>
+        Unit(int x, int y, Power power)
+        {
+            this.Y = Y;
+            this.X = X;
+            this.Dir = Direction.Down; //Powers always travel toward the player.
+
+            this.Symbol = "@";
+            this.IsPowerUp = true;
+
+            if (power == Power.Random)
+                this.PowerUpType = (Power)rng.Next(4); //Number between 0 and 3 to set a power.
+
+            switch (this.PowerUpType)
+            {
+                case Power.Ammo:
+                    this.Color = ConsoleColor.White;
+                    break;
+                case Power.Speed:
+                    this.Color = ConsoleColor.Green;
+                    break;
+                case Power.Health:
+                    this.Color = ConsoleColor.Red;
+                    break;
+            }
+        }
+
+
+        // ---- Methods ----
+
+
+        /// <summary>
+        /// Make this unit print itself to the console.
+        /// </summary>
+        public void Draw()
+        {
+            Console.SetCursorPosition(this.X, this.Y);
+            Console.ForegroundColor = this.Color;
+            Console.Write(this.Symbol);
+        }
+
+        public void ShipCollision(Ship player)
+        {
+            if(this.IsPowerUp)
+            {
+                switch (PowerUpType)
+                {
+                    case Power.Ammo:
+                        player.Ammo += 20;
+                        break;
+                    case Power.Speed:
+                        player.Speed -= 20;
+                        break;
+                    case Power.Health:
+                        player.Health += 20;
+                        break;
+                }
+            }
+        }
+    }
+
+    class Ship : Unit
+    {
+        //Properties
+        public int Speed { get; set; }
+        public int Health { get; set; }
+        public int Ammo { get; set; }
+
+        public bool IsAlive
+        {
+            get
+            {
+                if (this.Health > 0)
+                    return true;
+
+                return false;
+            }
+        }
+        
+        //Constructor
+
+    }
+}
