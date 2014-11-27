@@ -268,37 +268,84 @@ namespace HyperSpace
 
         public void PlayGame()
         {
+            bool playAgain = true;
 
-            int deathFrames = 7;
             do
-            {
-                //10% chance to spawn a power-up.
-                if (rng.Next(11) < 9) //Not a power up.
-                    this.ObstacleList.Add(new Unit(rng.Next(Console.WindowWidth - 2), 0, Unit.Direction.Down));
-                else //Is a power up.
-                    this.ObstacleList.Add(new Unit(rng.Next(Console.WindowWidth - 2), 0, Unit.Power.Random));
+	        {
+                //Set initial conditions.
+                ConsoleKey input = ConsoleKey.L; //Unused key.
+                SpaceShip.Health = 100;
+                SpaceShip.Speed = 0;
+                SpaceShip.Ammo = 20;
+                SpaceShip.Symbol = "^";
+                SpaceShip.X = Console.WindowWidth / 2 - 1;
+                SpaceShip.Y = Console.WindowHeight - 6;
+                Score = 0;
+                int deathFrames = 50;
 
-                MoveShip();
-                MoveObstacles();
-                DrawGame();
+                do
+                {
+                    //10% chance to spawn a power-up.
+                    if (rng.Next(11) < 9) //Not a power up.
+                        this.ObstacleList.Add(new Unit(rng.Next(Console.WindowWidth - 2), 0, Unit.Direction.Down));
+                    else //Is a power up.
+                        this.ObstacleList.Add(new Unit(rng.Next(Console.WindowWidth - 2), 0, Unit.Power.Random));
 
-                if (this.SpaceShip.Speed < 170)
-                    this.SpaceShip.Speed++;
+                    MoveShip();
+                    MoveObstacles();
+                    DrawGame();
 
-                if (this.SpaceShip.Speed < 0)
-                    this.SpaceShip.Speed = 0;
+                    if (this.SpaceShip.Speed < 170)
+                        this.SpaceShip.Speed++;
 
-                Thread.Sleep(190 - SpaceShip.Speed);
+                    if (this.SpaceShip.Speed < 0)
+                        this.SpaceShip.Speed = 0;
+
+                    Thread.Sleep(190 - SpaceShip.Speed);
                 
-            } while (SpaceShip.IsAlive);
+                } while (SpaceShip.IsAlive);
 
-            do
-            {
-                ExplosionList.Add(new Explosion ())
-                deathFrames--;
-                MoveObstacles();
-                DrawGame();
-            }
+                do //Death animation.
+                {
+                    if(deathFrames > 10)
+                        ExplosionList.Add(new Explosion(
+                            rng.Next(SpaceShip.X - 1, SpaceShip.X + 2), rng.Next(SpaceShip.Y - 1, SpaceShip.Y + 2)));
+
+                    deathFrames--;
+                    MoveObstacles();
+                    DrawGame();
+                }while (deathFrames > 0);
+
+                SpaceShip.Symbol = " ";
+                SpaceShip.Draw();
+
+                Console.ForegroundColor = ConsoleColor.Green;
+
+                Console.SetCursorPosition(20, 10);
+                Console.Write("--------------------");
+                Console.SetCursorPosition(20, 11);
+                Console.Write("|                  |");
+                Console.SetCursorPosition(20, 12);
+                Console.Write("|    Game Over!    |");
+                Console.SetCursorPosition(20, 13);
+                Console.Write("|    Try again?    |");
+                Console.SetCursorPosition(20, 14);
+                Console.Write("|       (Y\\N)      |");
+                Console.SetCursorPosition(20, 15);
+                Console.Write("|                  |");
+                Console.SetCursorPosition(20, 16);
+                Console.Write("--------------------");
+
+                do
+                {
+                    input = Console.ReadKey(true).Key;
+                    if(input == ConsoleKey.Y)
+                        playAgain = true;
+                    else
+                        playAgain = false;
+                } while (!(input == ConsoleKey.Y || input == ConsoleKey.N));
+
+	        } while (playAgain == true);
         }
 
         public void MoveShip()
@@ -416,8 +463,11 @@ namespace HyperSpace
                 i.Draw();
 
             foreach (Explosion i in ExplosionList)
-                i.Draw();
-
+            {
+                //Protect against player death explosions going outside the bounds of the window.
+                if (i.X > 0 && i.X < Console.WindowWidth - 2 && i.Y > 0 && i.Y < Console.WindowHeight - 5)
+                    i.Draw();
+            }
             PrintAtPosition(0, Console.WindowHeight - 5, "------------------------------------------------------------", ConsoleColor.White);
             PrintAtPosition(10, Console.WindowHeight - 3, "Score: " + this.Score, ConsoleColor.Green);
             PrintAtPosition(10, Console.WindowHeight - 2, "Speed: " + this.SpaceShip.Speed, ConsoleColor.Green);
